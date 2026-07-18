@@ -1,0 +1,18 @@
+============================================================
+PRISMA FLOW DIAGRAM
+============================================================
+
+Records identified through database searching:
+  Total: 493
+  Per file: {'0.txt': 102, '1.txt': 101, '2.txt': 101, '3.txt': 100, '4.txt': 79, '5.txt': 10}
+
+Records after merging: 493
+
+Duplicates removed: 12
+Records after deduplication: 481
+
+Records after cleaning: 477
+
+Studies included in final review: 477
+
+============================================================

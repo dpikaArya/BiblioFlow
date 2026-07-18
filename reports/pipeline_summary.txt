@@ -1,0 +1,12 @@
+AIBEF Pipeline Summary
+========================================
+Total imported: 493
+After merge: 493
+Duplicates found: 12
+After dedup: 481
+Validation issues: 169
+Metadata repairs: 5
+After cleaning: 477
+Final count: 477
+Synchronized: True
+Errors: 0

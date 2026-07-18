@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+*.whl
+*.spec
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Output directories (large generated files)
+outputs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# R library caches
+.rlib/
+
+# Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Model cache (large files)
+.cache/
+model_cache/
+
+# Large binary files
+*.bin
+*.onnx
+*.pt
+*.pth
+*.h5
+*.pkl
+*.joblib
+
+# Exclude .gitignore itself
+!.gitignore
