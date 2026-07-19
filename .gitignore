@@ -87,3 +87,4 @@ model_cache/
 
 # Exclude .gitignore itself
 !.gitignore
+logs/
