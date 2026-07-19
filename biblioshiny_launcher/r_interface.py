@@ -73,12 +73,4 @@ def launch_biblioshiny(
         return result, None
 
 
-def launch_biblioshiny_legacy(
-    dataset_path: Path,
-    config: BiblioshinyConfig,
-    env: Optional[dict] = None,
-) -> LaunchResult:
-    """Legacy interface: launch without returning the process handle."""
-    result, _proc = launch_biblioshiny(dataset_path, config, env)
-    result.browser_status = "launched" if result.success else result.browser_status
-    return result
+

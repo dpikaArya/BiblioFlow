@@ -3,16 +3,16 @@ PRISMA FLOW DIAGRAM
 ============================================================
 
 Records identified through database searching:
-  Total: 493
-  Per file: {'0.txt': 102, '1.txt': 101, '2.txt': 101, '3.txt': 100, '4.txt': 79, '5.txt': 10}
+  Total: 4277
+  Per file: {'1.txt': 269, '2.txt': 1004, 'savedrecs.txt': 1004, '1D.csv': 500, '2D.csv': 500, 'Dimensions-Publication-2026-07-19_09-51-19.csv': 500, 'Dimensions-Publication-2026-07-19_09-53-10.csv': 500}
 
-Records after merging: 493
+Records after merging: 4277
 
-Duplicates removed: 12
-Records after deduplication: 481
+Duplicates removed: 474
+Records after deduplication: 3803
 
-Records after cleaning: 477
+Records after cleaning: 3795
 
-Studies included in final review: 477
+Studies included in final review: 3795
 
 ============================================================

@@ -48,6 +48,7 @@ class ValidationChecks:
             "Bibliometrix_Compatible.xlsx",
             "Bibliometrix_Compatible.csv",
             "Bibliometrix_Compatible.txt",
+            "Bibliometrix_Validation_Report.docx",
             "PRISMA_Report.docx",
             "Validation_Report.docx",
             "Included_Studies.xlsx",
@@ -55,6 +56,8 @@ class ValidationChecks:
             "Screening_Log.xlsx",
             "Audit_Log.json",
             "Provenance_Log.json",
+            "R_Validation_Output.txt",
+            "R_Validation.json",
         ]
         results = {}
         for filename in expected:

@@ -28,8 +28,20 @@ env/
 Thumbs.db
 desktop.ini
 
+# Data directories (user-specific, not for repo)
+Data BibAI/
+Desktop/
+*.txt
+!requirements.txt
+!README.md
+
 # Output directories (large generated files)
 outputs/
+test_outputs/
+multidataset_outputs/
+
+# Logs
+logs/
 *.log
 
 # Temporary files
@@ -60,6 +72,18 @@ model_cache/
 *.h5
 *.pkl
 *.joblib
+
+# Large data files
+*.csv
+*.xlsx
+*.ris
+*.nbib
+*.bib
+*.bibtex
+*.xml
+*.end
+*.enw
+*.ciw
 
 # Exclude .gitignore itself
 !.gitignore

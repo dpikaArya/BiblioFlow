@@ -1,20 +1,34 @@
 """Central configuration for AIBEF framework."""
 import os
 import sys
+import shutil
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Optional
 
-# Force R_HOME for rpy2
-R_HOME = r"C:\Program Files\R\R-4.5.3"
-os.environ["R_HOME"] = R_HOME
+# Detect R_HOME from system (macOS / Linux / Windows)
+def _find_r_home():
+    rscript = shutil.which("Rscript")
+    if rscript:
+        return str(Path(rscript).parent.parent)
+    for candidate in [
+        "/Library/Frameworks/R.framework/Resources",
+        "/usr/lib/R",
+    ]:
+        if os.path.isdir(candidate):
+            return candidate
+    return ""
+
+R_HOME = _find_r_home()
+if R_HOME:
+    os.environ["R_HOME"] = R_HOME
 
 PROJECT_ROOT = Path(__file__).parent.parent
-INPUT_DIR = Path.home() / "Desktop" / "CR"
+INPUT_DIR = Path.home() / "Desktop" / "Data BibAI"
 OUTPUT_DIR = PROJECT_ROOT / "outputs"
 LOG_DIR = PROJECT_ROOT / "logs"
 REPORT_DIR = PROJECT_ROOT / "reports"
-REQUIRED_TXT_COUNT = 6
+REQUIRED_TXT_COUNT = 0  # 0 = accept any number of files
 
 BIBLIOMETRIX_COLUMNS = [
     "PT", "AU", "AF", "TI", "SO", "LA", "DT", "DE", "ID", "AB",
@@ -262,6 +276,6 @@ class BiblioshinyLaunchConfig:
     auto_open_browser: bool = True
     allow_uncertified_launch: bool = False
     r_home: str = R_HOME
-    rscript_path: str = r"C:\Program Files\R\R-4.5.3\bin\Rscript.exe"
+    rscript_path: str = shutil.which("Rscript") or "Rscript"
     certified_dataset_name: str = "Bibliometrix_Compatible.txt"
     launch_timeout_seconds: int = 30

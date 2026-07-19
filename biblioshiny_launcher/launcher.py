@@ -231,7 +231,7 @@ class BiblioshinyLaunchManager:
                 "Run the full AIBEF certification pipeline and ensure all stages pass "
                 "before attempting to launch Biblioshiny."
             )
-            doc.add_paragraph("Command: python run_certification.py")
+            doc.add_paragraph("Command: python main.py")
         elif "R environment" in prechecks.block_reason or "R_NOT_READY" in prechecks.certification_status:
             doc.add_paragraph(
                 "Ensure R >= 4.3 is installed and the bibliometrix package is available. "

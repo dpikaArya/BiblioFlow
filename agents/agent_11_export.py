@@ -49,8 +49,10 @@ class ExportAgent:
         self._export_txt(state, output_dir / "Bibliometrix_Compatible.txt")
         exported.append("Bibliometrix_Compatible.txt")
         
-        # 6. Bibliometrix_Validation_Report.docx
-        self._export_bibval_docx(state, output_dir / "Bibliometrix_Validation_Report.docx")
+        # 6. Bibliometrix_Validation_Report.docx (skip if 3-layer agent generated it)
+        bibval_path = output_dir / "Bibliometrix_Validation_Report.docx"
+        if not bibval_path.exists():
+            self._export_bibval_docx(state, bibval_path)
         exported.append("Bibliometrix_Validation_Report.docx")
         
         # 7. PRISMA_Report.docx

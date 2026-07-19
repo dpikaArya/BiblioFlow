@@ -25,7 +25,7 @@ def run_pipeline(input_dir: str = None, output_dir: str = None):
     orchestrator = PipelineOrchestrator(config)
     state = orchestrator.run()
 
-    ReportGenerator.generate_all(state, config.report_dir)
+    ReportGenerator.generate_all(state, config.output_dir, config.report_dir)
 
     sync_ok = ValidationChecks.verify_synchronization(state)
     bib_ok = ValidationChecks.verify_bibliometrix_compatible(state)
@@ -50,6 +50,22 @@ def run_pipeline(input_dir: str = None, output_dir: str = None):
         print(f"\nErrors ({len(state.errors)}):")
         for error in state.errors:
             print(f"  - {error}")
+
+    if sync_ok and bib_ok:
+        certified_path = config.output_dir / "Bibliometrix_Compatible.txt"
+        if certified_path.exists():
+            print("\n" + "=" * 60)
+            print("READY_FOR_BIBLIOSHINY")
+            print("=" * 60)
+            print(f"  Certified Dataset:  {certified_path.name}")
+            print(f"  File Path:          {certified_path}")
+            print(f"  Records:            {state.stats.final_count}")
+            print(f"  Format:             TAB-delimited (.txt)")
+            print(f"  Database Source:    {state.stats.per_file}")
+            print(f"  Certification:      PASS (synchronized + bibliometrix compatible)")
+            print(f"\n  The dataset is certified for direct use with Biblioshiny.")
+            print(f"  Launch with: python main.py --launch-biblioshiny-only")
+            print("=" * 60)
 
     print("=" * 60)
     return state, config

@@ -796,7 +796,7 @@ class TestRegressionCompatibility:
         assert callable(check_biblioshiny_running)
 
     def test_existing_r_interface_still_works(self):
-        from biblioshiny_launcher.r_interface import build_launch_command, launch_biblioshiny_legacy
+        from biblioshiny_launcher.r_interface import build_launch_command
         cfg = BiblioshinyConfig()
         cmd = build_launch_command(Path("/tmp/test.txt"), cfg)
         assert "biblioshiny()" in cmd[2]

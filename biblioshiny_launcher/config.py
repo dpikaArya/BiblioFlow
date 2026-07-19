@@ -48,8 +48,8 @@ class BiblioshinyConfig:
     use_external_r_process: bool = True
     auto_open_browser: bool = True
     allow_uncertified_launch: bool = False
-    r_home: str = r"C:\Program Files\R\R-4.5.3"
-    rscript_path: str = r"C:\Program Files\R\R-4.5.3\bin\Rscript.exe"
+    r_home: str = ""
+    rscript_path: str = ""
     certified_dataset_name: str = "Bibliometrix_Compatible.txt"
     launch_timeout_seconds: int = 30
     log_dir: str = ""
