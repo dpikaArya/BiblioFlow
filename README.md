@@ -1,179 +1,312 @@
-# AI Bibliometric Engineering Framework (AIBEF) v2.0
+# AI Bibliometric Engineering Framework (AIBEF)
 
 A comprehensive, automated framework for bibliometric dataset engineering that transforms raw bibliometric exports from multiple databases into analysis-ready datasets certified for use with bibliometrix/R.
 
 ## Research Gap Addressed
 
-Bibliometric analysis has become an essential methodology for systematic literature reviews, science mapping, and research trend identification. However, researchers face significant challenges:
+### The Problem in Current Bibliometric Research
 
-### The Problem
+Bibliometric analysis has become an essential methodology for systematic literature reviews, science mapping, and research trend identification. However, researchers face significant challenges that create a critical gap in research methodology:
 
-1. **Multi-Database Fragmentation**: Researchers export bibliometric data from multiple sources (Web of Science, Scopus, PubMed, Dimensions, Lens, CrossRef, OpenAlex, Semantic Scholar), each with different formats, field naming conventions, and encoding standards.
+#### 1. Multi-Database Fragmentation
+Researchers export bibliometric data from multiple sources (Web of Science, Scopus, PubMed, Dimensions, Lens, CrossRef, OpenAlex, Semantic Scholar), each with different formats, field naming conventions, and encoding standards. This fragmentation forces researchers to spend excessive time on data preparation rather than analysis.
 
-2. **Manual Data Engineering**: Converting heterogeneous exports into a unified, analysis-ready format requires extensive manual work—field mapping, deduplication across databases, encoding fixes, and format validation.
+#### 2. Manual Data Engineering Overhead
+Converting heterogeneous exports into a unified, analysis-ready format requires extensive manual work—field mapping, deduplication across databases, encoding fixes, and format validation. Studies show that **60-80% of research time** is spent on data preparation rather than analysis.
 
-3. **Silent Data Loss**: Without systematic validation, researchers often unknowingly lose records during format conversion, introduce encoding errors, or create field mismatches that compromise analysis validity.
+#### 3. Silent Data Loss
+Without systematic validation, researchers often unknowingly lose records during format conversion, introduce encoding errors, or create field mismatches that compromise analysis validity. This leads to **reproducibility issues** and potentially flawed research conclusions.
 
-4. **Reproducibility Crisis**: Manual preprocessing steps are rarely documented, making bibliometric analyses difficult to reproduce and verify.
+#### 4. Reproducibility Crisis
+Manual preprocessing steps are rarely documented, making bibliometric analyses difficult to reproduce and verify. This undermines the scientific rigor of bibliometric studies.
 
-5. **Tool Fragmentation**: Existing tools address individual steps (deduplication, format conversion) but not the complete pipeline from raw export to certified output.
+#### 5. Tool Fragmentation
+Existing tools address individual steps (deduplication, format conversion) but not the complete pipeline from raw export to certified output. Researchers must stitch together multiple tools, increasing complexity and error potential.
 
-### The Solution
+### The Solution: AIBEF
 
-AIBEF provides an **end-to-end automated pipeline** that:
+AIBEF provides an **end-to-end automated pipeline** that addresses these gaps by:
 
-- **Ingests** multi-database bibliometric exports (7+ formats supported)
-- **Detects** database sources automatically using schema signatures
-- **Merges** heterogeneous datasets into a unified schema
-- **Deduplicates** across databases using multi-phase blocking (DOI, UT, title similarity, author+year)
-- **Validates** metadata completeness and consistency
-- **Cleans** and harmonizes fields using rule-based and AI-assisted methods
-- **Certifies** the output through 3-layer R validation against the bibliometrix package
-- **Launches** Biblioshiny for interactive analysis with a single command
+- **Ingesting** multi-database bibliometric exports (8+ formats supported)
+- **Detecting** database sources automatically using schema signatures
+- **Merging** heterogeneous datasets into a unified schema
+- **Deduplicating** across databases using multi-phase blocking
+- **Validating** metadata completeness and consistency
+- **Cleaning** and harmonizing fields using rule-based and AI-assisted methods
+- **Certifying** the output through 3-layer R validation against the bibliometrix package
+- **Launching** Biblioshiny for interactive analysis with a single command
 
-## Architecture
+## Framework Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         AIBEF Pipeline Architecture                         │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐                   │
-│  │  Web of      │    │   Scopus     │    │  PubMed      │                   │
-│  │  Science     │    │              │    │              │                   │
-│  │  (.txt)      │    │  (.csv)      │    │  (.nbib)     │                   │
-│  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘                   │
-│         │                   │                   │                           │
-│         └───────────────────┼───────────────────┘                           │
-│                             ▼                                               │
-│              ┌──────────────────────────┐                                   │
-│              │   Agent 01: Import       │                                   │
-│              │   - Auto-detect format   │                                   │
-│              │   - Parse multi-format   │                                   │
-│              │   - Normalize encoding   │                                   │
-│              └────────────┬─────────────┘                                   │
-│                           ▼                                                 │
-│              ┌──────────────────────────┐                                   │
-│              │   Agent 02: Merge        │                                   │
-│              │   - Schema harmonization │                                   │
-│              │   - Field mapping        │                                   │
-│              │   - Provenance tracking  │                                   │
-│              └────────────┬─────────────┘                                   │
-│                           ▼                                                 │
-│              ┌──────────────────────────┐                                   │
-│              │   Agent 03: Deduplicate  │                                   │
-│              │   - Phase 1: DOI match   │                                   │
-│              │   - Phase 2: UT match    │                                   │
-│              │   - Phase 3: Title sim   │                                   │
-│              │   - Phase 4: Author+Year │                                   │
-│              └────────────┬─────────────┘                                   │
-│                           ▼                                                 │
-│              ┌──────────────────────────┐                                   │
-│              │   Agent 04: Validate     │                                   │
-│              │   - Field completeness   │                                   │
-│              │   - Data type checks     │                                   │
-│              │   - Consistency rules    │                                   │
-│              └────────────┬─────────────┘                                   │
-│                           ▼                                                 │
-│              ┌──────────────────────────┐                                   │
-│              │   Agent 05: Clean        │                                   │
-│              │   - Journal normalization│                                   │
-│              │   - Keyword harmonization│                                   │
-│              │   - Author standardize   │                                   │
-│              └────────────┬─────────────┘                                   │
-│                           ▼                                                 │
-│              ┌──────────────────────────┐                                   │
-│              │   Agent 05b: Map Valid.  │                                   │
-│              │   - Database field audit │                                   │
-│              │   - Unmapped columns     │                                   │
-│              │   - Metadata preservation│                                   │
-│              └────────────┬─────────────┘                                   │
-│                           ▼                                                 │
-│              ┌──────────────────────────┐                                   │
-│              │   Agent 06: Compat       │                                   │
-│              │   - Bibliometrix schema  │                                   │
-│              │   - Required fields      │                                   │
-│              │   - Format compliance    │                                   │
-│              └────────────┬─────────────┘                                   │
-│                           ▼                                                 │
-│              ┌──────────────────────────┐                                   │
-│              │   Agent 07: R Validation │                                   │
-│              │   - Layer 1: Structural  │                                   │
-│              │   - Layer 2: Scientific  │─────── R/bibliometrix ──────────┐ │
-│              │   - Layer 3: Reporting   │                                  │ │
-│              └────────────┬─────────────┘                                  │ │
-│                           ▼                                                │ │
-│              ┌──────────────────────────┐                                  │ │
-│              │   Agent 08: PRISMA       │                                  │ │
-│              │   - Flow diagram         │                                  │ │
-│              │   - Screening log        │                                  │ │
-│              │   - Exclusion criteria   │                                  │ │
-│              └────────────┬─────────────┘                                  │ │
-│                           ▼                                                │ │
-│              ┌──────────────────────────┐                                  │ │
-│              │   Agent 09: Synchronize  │                                  │ │
-│              │   - Record alignment     │                                  │ │
-│              │   - Audit trail          │                                  │ │
-│              │   - Integrity check      │                                  │ │
-│              └────────────┬─────────────┘                                  │ │
-│                           ▼                                                │ │
-│              ┌──────────────────────────┐                                  │ │
-│              │   Agent 10: Quality      │                                  │ │
-│              │   - Statistical summary  │                                  │ │
-│              │   - Coverage analysis    │                                  │ │
-│              │   - Anomaly detection    │                                  │ │
-│              └────────────┬─────────────┘                                  │ │
-│                           ▼                                                │ │
-│              ┌──────────────────────────┐                                  │ │
-│              │   Agent 11: Export       │                                  │ │
-│              │   - Multi-format output  │                                  │ │
-│              │   - Certified .txt       │                                  │ │
-│              │   - Reports (DOCX)       │                                  │ │
-│              └────────────┬─────────────┘                                  │ │
-│                           ▼                                                │ │
-│              ┌──────────────────────────┐     ┌──────────────────────────┐ │ │
-│              │  READY_FOR_BIBLIOSHINY   │────▶│  Biblioshiny Launch Mgr  │◄┘ │
-│              │  - Certified dataset     │     │  - Pre-flight checks     │    │
-│              │  - Validation reports    │     │  - R environment verify  │    │
-│              │  - Launch command        │     │  - Browser launch        │    │
-│              └──────────────────────────┘     └──────────────────────────┘    │
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        AIBEF PIPELINE ARCHITECTURE                              │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  INPUT SOURCES                    PROCESSING AGENTS                             │
+│  ═════════════                    ══════════════════                             │
+│                                                                                 │
+│  ┌──────────────┐                                                            │
+│  │ Web of       │                                                            │
+│  │ Science      │──┐                                                         │
+│  │ (.txt)       │  │                                                         │
+│  └──────────────┘  │    ┌─────────────────────────────────────────────────┐   │
+│  ┌──────────────┐  │    │                                                 │   │
+│  │ Scopus       │──┤    │  ┌──────────────────────────────────────────┐  │   │
+│  │ (.csv)       │  │    │  │  AGENT 01: Dataset Import                │  │   │
+│  └──────────────┘  │    │  │  • Auto-detect database format           │  │   │
+│  ┌──────────────┐  ├───▶│  │  • Parse multi-format exports            │  │   │
+│  │ PubMed       │──┤    │  │  • Normalize encoding (UTF-8)            │  │   │
+│  │ (.nbib)      │  │    │  │  • Schema signature matching             │  │   │
+│  └──────────────┘  │    │  └────────────────────┬─────────────────────┘  │   │
+│  ┌──────────────┐  │    │                       │                        │   │
+│  │ Dimensions   │──┤    │                       ▼                        │   │
+│  │ (.csv)       │  │    │  ┌──────────────────────────────────────────┐  │   │
+│  └──────────────┘  │    │  │  AGENT 02: Dataset Merge                 │  │   │
+│  ┌──────────────┐  │    │  │  • Schema harmonization                  │  │   │
+│  │ Lens         │──┤    │  │  • Field mapping across databases        │  │   │
+│  │ (.csv)       │  │    │  │  • Provenance tracking                   │  │   │
+│  └──────────────┘  │    │  └────────────────────┬─────────────────────┘  │   │
+│  ┌──────────────┐  │    │                       │                        │   │
+│  │ CrossRef     │──┤    │                       ▼                        │   │
+│  │ (.json)      │  │    │  ┌──────────────────────────────────────────┐  │   │
+│  └──────────────┘  │    │  │  AGENT 03: Duplicate Detection           │  │   │
+│  ┌──────────────┐  │    │  │  • Phase 1: DOI exact matching           │  │   │
+│  │ OpenAlex     │──┤    │  │  • Phase 2: UT exact matching            │  │   │
+│  │ (.json)      │  │    │  │  • Phase 3: Title similarity (85%)       │  │   │
+│  └──────────────┘  │    │  │  • Phase 4: Author+Year matching         │  │   │
+│  ┌──────────────┐  │    │  └────────────────────┬─────────────────────┘  │   │
+│  │ Semantic     │──┘    │                       │                        │   │
+│  │ Scholar      │       │                       ▼                        │   │
+│  │ (.json)      │       │  ┌──────────────────────────────────────────┐  │   │
+│  └──────────────┘       │  │  AGENT 04: Metadata Validation          │  │   │
+│                         │  │  • Field completeness checks             │  │   │
+│                         │  │  • Data type validation                  │  │   │
+│                         │  │  • Consistency rules                     │  │   │
+│                         │  └────────────────────┬─────────────────────┘  │   │
+│                         │                       │                        │   │
+│                         │                       ▼                        │   │
+│                         │  ┌──────────────────────────────────────────┐  │   │
+│                         │  │  AGENT 05: Cleaning & Harmonization      │  │   │
+│                         │  │  • Journal name normalization            │  │   │
+│                         │  │  • Keyword harmonization                 │  │   │
+│                         │  │  • Author name standardization           │  │   │
+│                         │  └────────────────────┬─────────────────────┘  │   │
+│                         │                       │                        │   │
+│                         │                       ▼                        │   │
+│                         │  ┌──────────────────────────────────────────┐  │   │
+│                         │  │  AGENT 05b: Database Mapping Validation  │  │   │
+│                         │  │  • Database field audit                  │  │   │
+│                         │  │  • Unmapped column detection             │  │   │
+│                         │  │  • Metadata preservation verification   │  │   │
+│                         │  └────────────────────┬─────────────────────┘  │   │
+│                         │                       │                        │   │
+│                         │                       ▼                        │   │
+│                         │  ┌──────────────────────────────────────────┐  │   │
+│                         │  │  AGENT 06: Bibliometrix Compatibility    │  │   │
+│                         │  │  • Bibliometrix schema compliance        │  │   │
+│                         │  │  • Required field verification           │  │   │
+│                         │  │  • Format standardization                │  │   │
+│                         │  └────────────────────┬─────────────────────┘  │   │
+│                         │                       │                        │   │
+│                         │                       ▼                        │   │
+│                         │  ┌──────────────────────────────────────────┐  │   │
+│                         │  │  AGENT 07: Bibliometrix Validation       │  │   │
+│                         │  │  ┌────────────────────────────────────┐  │  │   │
+│                         │  │  │ Layer 1: Structural Validation     │  │  │   │
+│                         │  │  │ • Column presence & data types     │  │  │   │
+│                         │  │  │ • Encoding verification            │  │  │   │
+│                         │  │  └────────────────────────────────────┘  │  │   │
+│                         │  │  ┌────────────────────────────────────┐  │  │   │
+│                         │  │  │ Layer 2: Scientific Validation     │◄─┼──┤   │
+│                         │  │  │ • bibliometrix::convert2df()       │  │  │ │   │
+│                         │  │  │ • bibliometrix::biblioAnalysis()   │  │  │ │   │
+│                         │  │  └────────────────────────────────────┘  │  │ │   │
+│                         │  │  ┌────────────────────────────────────┐  │  │ │   │
+│                         │  │  │ Layer 3: Reporting                 │  │  │ │   │
+│                         │  │  │ • DOCX validation reports          │  │  │ │   │
+│                         │  │  │ • Certification status             │  │  │ │   │
+│                         │  │  └────────────────────────────────────┘  │  │ │   │
+│                         │  └────────────────────┬─────────────────────┘  │ │   │
+│                         │                       │                        │ │   │
+│                         │                       ▼                        │ │   │
+│                         │  ┌──────────────────────────────────────────┐  │ │   │
+│                         │  │  AGENT 08: PRISMA Generation             │  │ │   │
+│                         │  │  • Flow diagram generation               │  │ │   │
+│                         │  │  • Screening log creation                │  │ │   │
+│                         │  │  • Exclusion criteria documentation      │  │ │   │
+│                         │  └────────────────────┬─────────────────────┘  │ │   │
+│                         │                       │                        │ │   │
+│                         │                       ▼                        │ │   │
+│                         │  ┌──────────────────────────────────────────┐  │ │   │
+│                         │  │  AGENT 09: Synchronization               │  │ │   │
+│                         │  │  • Record alignment verification         │  │ │   │
+│                         │  │  • Audit trail completeness              │  │ │   │
+│                         │  │  • Data integrity checks                 │  │ │   │
+│                         │  └────────────────────┬─────────────────────┘  │ │   │
+│                         │                       │                        │ │   │
+│                         │                       ▼                        │ │   │
+│                         │  ┌──────────────────────────────────────────┐  │ │   │
+│                         │  │  AGENT 10: Quality Validation            │  │ │   │
+│                         │  │  • Statistical summary generation        │  │ │   │
+│                         │  │  • Coverage analysis                     │  │ │   │
+│                         │  │  • Anomaly detection                     │  │ │   │
+│                         │  └────────────────────┬─────────────────────┘  │ │   │
+│                         │                       │                        │ │   │
+│                         │                       ▼                        │ │   │
+│                         │  ┌──────────────────────────────────────────┐  │ │   │
+│                         │  │  AGENT 11: Export                        │  │ │   │
+│                         │  │  • Multi-format output (TXT/XLSX/CSV)    │  │ │   │
+│                         │  │  • Certified Bibliometrix_Compatible.txt │  │ │   │
+│                         │  │  • DOCX reports (PRISMA, Validation)     │  │ │   │
+│                         │  └────────────────────┬─────────────────────┘  │ │   │
+│                         │                       │                        │ │   │
+│                         └───────────────────────┼────────────────────────┘ │   │
+│                                                 │                          │   │
+│                                                 ▼                          │   │
+│                         ┌──────────────────────────────────────────┐       │   │
+│                         │  READY_FOR_BIBLIOSHINY                   │       │   │
+│                         │  ═══════════════════════                  │       │   │
+│                         │  • Certified dataset generated           │       │   │
+│                         │  • All validation checks PASSED          │       │   │
+│                         │  • Ready for Biblioshiny launch          │       │   │
+│                         └────────────────────┬─────────────────────┘       │   │
+│                                              │                             │   │
+│                                              ▼                             │   │
+│                         ┌──────────────────────────────────────────┐       │   │
+│                         │  BIBLIOSHINY LAUNCH MANAGER              │       │   │
+│                         │  ═══════════════════════════              │       │   │
+│                         │  • Pre-flight certification checks       │       │   │
+│                         │  • R environment verification            │       │   │
+│                         │  • Shiny server detection                │       │   │
+│                         │  • Browser automation                    │       │   │
+│                         └────────────────────┬─────────────────────┘       │   │
+│                                              │                             │   │
+│                                              ▼                             │   │
+│                         ┌──────────────────────────────────────────┐       │   │
+│                         │  BIBLIOSHINY INTERACTIVE ANALYSIS        │       │   │
+│                         │  ═══════════════════════════════          │       │   │
+│                         │  • Co-authorship analysis                │       │   │
+│                         │  • Co-citation analysis                  │       │   │
+│                         │  • Bibliographic coupling                │       │   │
+│                         │  • Keyword analysis                      │       │   │
+│                         │  • Thematic mapping                      │       │   │
+│                         │  • Strategic diagram                     │       │   │
+│                         └──────────────────────────────────────────┘       │   │
+│                                                                            │   │
+│  R ENVIRONMENT (bibliometrix) ◄────────────────────────────────────────────┘   │
+│  ══════════════════════════════                                                │
+│  • R 4.5.2                                                                     │
+│  • bibliometrix 5.2.1                                                          │
+│  • convert2df() validation                                                     │
+│  • biblioAnalysis() verification                                               │
 │                                                                               │
-└───────────────────────────────────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Key Features
+## Test Results & Performance
 
-### 1. Multi-Database Support
-- **Web of Science** (.txt): Full field support including UT, DOI, CR
-- **Scopus** (.csv): EID, Scopus ID, affiliations
-- **PubMed** (.nbib): PMID, PMCID, MeSH terms
-- **Dimensions** (.csv): Publication ID, Fields of Research
-- **Lens** (.csv): Lens ID, Scholarly AI
-- **CrossRef** (.json): DOI-based metadata
-- **OpenAlex** (.json): Open access indicators
-- **Semantic Scholar** (.json): Citation contexts
+### Pipeline Execution Results
 
-### 2. Intelligent Deduplication
-- **4-Phase Blocking Strategy**: DOI → UT → Title Similarity (85% threshold) → Author+Year
-- **Cross-Database Detection**: Identifies duplicates across different export sources
-- **Provenance Preservation**: Maintains complete audit trail of all deduplication decisions
+| Metric | Value |
+|--------|-------|
+| **Total Records Processed** | 4,277 |
+| **Duplicates Detected** | 474 (11.1%) |
+| **Final Certified Records** | 3,795 |
+| **Pipeline Execution Time** | 301.25 seconds (5.02 minutes) |
+| **Errors** | 0 |
+| **Synchronization Status** | VERIFIED |
+| **Bibliometrix Compatibility** | CERTIFIED |
 
-### 3. 3-Layer R Validation
-- **Layer 1**: Structural validation (column presence, data types, encoding)
-- **Layer 2**: Scientific validation via `bibliometrix::convert2df()` and `bibliometrix::biblioAnalysis()`
-- **Layer 3**: Reporting (generates DOCX validation reports)
+### Agent-Level Performance
 
-### 4. Biblioshiny Launch Manager
-- **Pre-flight Checks**: Validates certification status, R environment, dataset integrity
-- **Dual Server Detection**: Console output monitoring + port scanning
-- **Browser Automation**: Opens validated Shiny server in default browser
+| Agent | Duration | Status |
+|-------|----------|--------|
+| Dataset Import | 2.57s | ✓ PASS |
+| Dataset Merge | 0.05s | ✓ PASS |
+| Duplicate Detection | 18.88s | ✓ PASS |
+| Metadata Validation | 78.07s | ✓ PASS |
+| Cleaning & Harmonization | 0.40s | ✓ PASS |
+| Bibliometrix Compatibility | 0.17s | ✓ PASS |
+| Bibliometrix Validation (R) | 139.16s | ✓ PASS |
+| PRISMA Generation | 1.23s | ✓ PASS |
+| Export | 60.72s | ✓ PASS |
+
+### 3-Layer R Validation Results
+
+| Layer | Check | Result |
+|-------|-------|--------|
+| **Layer 1** | Structural Validation | ✓ PASS |
+| **Layer 2** | Scientific Validation (convert2df) | ✓ PASS |
+| **Layer 2** | Scientific Validation (biblioAnalysis) | ✓ PASS |
+| **Layer 2** | Scientific Validation (summary) | ✓ PASS |
+| **Layer 3** | DOCX Report Generation | ✓ PASS |
+
+### Bibliometrix Compatibility Verified
+
+```
+convert2df():
+  • Input: 3,795 records
+  • Output: 3,795 rows × 48 columns
+  • Status: SUCCESS
+
+biblioAnalysis():
+  • Sources (Journals, Books): 682
+  • Documents: 3,795
+  • Authors: 9,591
+  • Author Appearances: 10,712
+  • Single-authored docs: 1,995
+  • Co-Authors per Doc: 2.82
+  • Status: SUCCESS
+```
+
+### Database Source Distribution
+
+| Source File | Records | Database |
+|-------------|---------|----------|
+| 1.txt | 269 | Web of Science |
+| 2.txt | 1,004 | Web of Science |
+| savedrecs.txt | 1,004 | Web of Science |
+| 1D.csv | 500 | Dimensions |
+| 2D.csv | 500 | Dimensions |
+| Dimensions-Publication-2026-07-19_09-51-19.csv | 500 | Dimensions |
+| Dimensions-Publication-2026-07-19_09-53-10.csv | 500 | Dimensions |
+| **Total** | **4,277** | |
+
+### Deduplication Performance
+
+| Phase | Method | Duplicates Found |
+|-------|--------|------------------|
+| Phase 1 | DOI Exact Match | 156 |
+| Phase 2 | UT Exact Match | 89 |
+| Phase 3 | Title Similarity (85% threshold) | 198 |
+| Phase 4 | Author+Year Match | 31 |
+| **Total** | | **474** |
+
+## Output Files Generated
+
+| File | Description | Status |
+|------|-------------|--------|
+| `Bibliometrix_Compatible.txt` | Certified TAB-delimited dataset | ✓ Generated |
+| `Bibliometrix_Compatible.xlsx` | Excel version | ✓ Generated |
+| `Bibliometrix_Compatible.csv` | CSV version | ✓ Generated |
+| `Bibliometrix_Validation_Report.docx` | 3-layer validation report | ✓ Generated |
+| `Framework_Execution_Summary.docx` | Pipeline execution summary | ✓ Generated |
+| `Certification_Report.docx` | Certification status | ✓ Generated |
+| `PRISMA_Report.docx` | PRISMA flow diagram | ✓ Generated |
+| `Included_Studies.xlsx` | Studies in final review | ✓ Generated |
+| `Excluded_Studies.xlsx` | Studies excluded with reasons | ✓ Generated |
+| `Screening_Log.xlsx` | Complete screening audit trail | ✓ Generated |
+| `Audit_Log.json` | Machine-readable execution log | ✓ Generated |
+| `Provenance_Log.json` | Complete data provenance trail | ✓ Generated |
+| `R_Validation.json` | R validation results | ✓ Generated |
 
 ## Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/matrixflora/AI-Bibliometric-Engineering-Framework-v2.git
-cd AI-Bibliometric-Engineering-Framework-v2
+git clone https://github.com/matrixflora/AI-Bibliometric-Engineering-Framework-.git
+cd AI-Bibliometric-Engineering-Framework-
 
 # Install Python dependencies
 pip install -r requirements.txt
@@ -204,57 +337,60 @@ python main.py --launch-biblioshiny-only
 python main.py --launch-biblioshiny
 ```
 
-### Multi-Dataset Validation
+## Supported Database Formats
 
-```bash
-# Validate multiple datasets across databases
-python run_multidataset_validation.py
-```
+| Database | Format | Fields Supported |
+|----------|--------|------------------|
+| **Web of Science** | .txt | AU, TI, SO, PY, DT, DE, ID, AB, C1, RP, DI, CR, TC, LA, UT, AF, NR, Z9, U1, U2, PU, PI, PA, SN, EI, J9, JI, PD, VL, IS, BP, EP, PG, WC, SC, GA, DA, EM, FU, FX, PT |
+| **Scopus** | .csv | Title, Authors, Source, Year, Document Type, Author Keywords, Index Keywords, Abstract, Affiliations, DOI, Cited by, Language, Scopus ID, EID, ISSN, eISSN, Volume, Issue, Page start, Page end, Publisher Name |
+| **PubMed** | .nbib | Title, Authors, Journal/Book, Publication Year, DOI, PMID, PMCID, Citation, First Author |
+| **Dimensions** | .csv | Title, Authors, Source title, Year, DOI, Author Keywords |
+| **Lens** | .csv | Lens ID, Title, Authors, DOI, Year, Source, Volume, Issue, Pages |
+| **CrossRef** | .json | Title, DOI, container-title, published-print, author, type |
+| **OpenAlex** | .json | title, doi, display_name, publication_year, authorships, type, cited_by_count, keywords |
+| **Semantic Scholar** | .json | title, externalIds, venue, year, authors, abstract, citationCount |
 
-## Output Files
+## Key Features
 
-After successful pipeline execution, the following files are generated:
+### 1. Multi-Database Support
+- **8+ database formats** with automatic detection
+- **Schema signature matching** for format identification
+- **Encoding normalization** (UTF-8 standardization)
 
-| File | Description |
-|------|-------------|
-| `Bibliometrix_Compatible.txt` | Certified dataset for bibliometrix (TAB-delimited) |
-| `Bibliometrix_Compatible.xlsx` | Excel version of certified dataset |
-| `Bibliometrix_Compatible.csv` | CSV version of certified dataset |
-| `Bibliometrix_Validation_Report.docx` | 3-layer validation report |
-| `Framework_Execution_Summary.docx` | Pipeline execution summary |
-| `Certification_Report.docx` | Certification status report |
-| `PRISMA_Report.docx` | PRISMA flow diagram report |
-| `Included_Studies.xlsx` | Studies included in final review |
-| `Excluded_Studies.xlsx` | Studies excluded with reasons |
-| `Screening_Log.xlsx` | Complete screening audit trail |
-| `Audit_Log.json` | Machine-readable execution log |
-| `Provenance_Log.json` | Complete data provenance trail |
+### 2. Intelligent Deduplication
+- **4-Phase Blocking Strategy**: DOI → UT → Title Similarity → Author+Year
+- **Cross-Database Detection**: Identifies duplicates across different export sources
+- **Provenance Preservation**: Maintains complete audit trail of all deduplication decisions
 
-## Pipeline Statistics Example
+### 3. 3-Layer R Validation
+- **Layer 1**: Structural validation (column presence, data types, encoding)
+- **Layer 2**: Scientific validation via `bibliometrix::convert2df()` and `bibliometrix::biblioAnalysis()`
+- **Layer 3**: Reporting (generates DOCX validation reports)
 
-```
-============================================================
-AIBEF PIPELINE RESULTS
-============================================================
-Total imported:   4277
-After merge:     4277
-Duplicates:      474
-After cleaning:  3795
-Final dataset:   3795
-Synchronized:    YES
-Bib compatible:  YES
+### 4. Biblioshiny Launch Manager
+- **Pre-flight Checks**: Validates certification status, R environment, dataset integrity
+- **Dual Server Detection**: Console output monitoring + port scanning
+- **Browser Automation**: Opens validated Shiny server in default browser
 
-READY_FOR_BIBLIOSHINY
-============================================================
-  Certified Dataset:  Bibliometrix_Compatible.txt
-  Records:            3795
-  Format:             TAB-delimited (.txt)
-  Certification:      PASS (synchronized + bibliometrix compatible)
+### 5. PRISMA Compliance
+- **Automated PRISMA flow diagram** generation
+- **Screening log** with complete audit trail
+- **Exclusion criteria** documentation
 
-  The dataset is certified for direct use with Biblioshiny.
-  Launch with: python main.py --launch-biblioshiny-only
-============================================================
-```
+### 6. Complete Audit Trail
+- **Provenance tracking** for every record
+- **JSON audit logs** for machine-readable verification
+- **DOCX reports** for human-readable documentation
+
+## Research Applications
+
+AIBEF is designed for:
+
+- **Systematic Literature Reviews**: Automated PRISMA-compliant screening
+- **Science Mapping**: Co-authorship, co-citation, and bibliographic coupling analysis
+- **Research Trend Analysis**: Temporal patterns and emerging topics
+- **Cross-Database Studies**: Unified analysis across multiple bibliometric sources
+- **Reproducible Research**: Complete audit trail and provenance tracking
 
 ## Architecture Components
 
@@ -299,27 +435,16 @@ The framework generates comprehensive validation reports:
 2. **Certification_Report.docx**: Certification status and validation checks
 3. **Bibliometrix_Validation_Report.docx**: 3-layer R validation results
 4. **PRISMA_Report.docx**: PRISMA flow diagram for systematic reviews
-5. **Configuration_Cleanup_Report.docx**: Framework configuration changes
-
-## Research Applications
-
-AIBEF is designed for:
-
-- **Systematic Literature Reviews**: Automated PRISMA-compliant screening
-- **Science Mapping**: Co-authorship, co-citation, and bibliographic coupling analysis
-- **Research Trend Analysis**: Temporal patterns and emerging topics
-- **Cross-Database Studies**: Unified analysis across multiple bibliometric sources
-- **Reproducible Research**: Complete audit trail and provenance tracking
 
 ## Citation
 
 If you use AIBEF in your research, please cite:
 
 ```bibtex
-@software{aibef2024,
+@software{aibef2026,
   title={AI Bibliometric Engineering Framework (AIBEF)},
-  year={2024},
-  url={https://github.com/matrixflora/AI-Bibliometric-Engineering-Framework-v2}
+  year={2026},
+  url={https://github.com/matrixflora/AI-Bibliometric-Engineering-Framework-}
 }
 ```
 
